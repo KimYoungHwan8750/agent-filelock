@@ -1,5 +1,5 @@
 {
-  "name": "@agent-agent/filelock",
+  "name": "agent-filelock",
   "version": "1.0.0",
   "description": "Centralized file lock management for Claude Code and human collaborators",
   "type": "module",

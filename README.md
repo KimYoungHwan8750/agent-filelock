@@ -1,4 +1,4 @@
-# @agent-agent/filelock
+# agent-filelock
 
 ---
 
