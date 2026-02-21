@@ -1,0 +1,9 @@
+export const DEFAULT_PORT = 8079;
+export const DEFAULT_SERVER_URL = `http://localhost:${DEFAULT_PORT}`;
+export const DEFAULT_AGENT_TTL_MINUTES = 60;
+export const DEFAULT_HUMAN_TTL_MINUTES = 240;
+export const DEFAULT_STOLEN_TTL_MINUTES = 30;
+export const CLEANUP_INTERVAL_MS = 60_000;
+export const DEFAULT_DB_PATH = './data/filelock.db';
+export const SERVER_VERSION = '1.0.0';
+export const API_PREFIX = '/api/v1';

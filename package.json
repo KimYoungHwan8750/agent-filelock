@@ -1,0 +1,29 @@
+{
+  "name": "@agent-agent/filelock",
+  "version": "1.0.0",
+  "description": "Centralized file lock management for Claude Code and human collaborators",
+  "type": "module",
+  "bin": {
+    "filelock": "./dist/cli/index.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsx src/server/index.ts",
+    "start": "node dist/server/index.js",
+    "cli": "tsx src/cli/index.ts",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "dependencies": {
+    "better-sqlite3": "^11.9.1",
+    "commander": "^13.1.0",
+    "fastify": "^5.2.1"
+  },
+  "devDependencies": {
+    "@types/better-sqlite3": "^7.6.13",
+    "@types/node": "^22.13.4",
+    "tsx": "^4.19.3",
+    "typescript": "^5.7.3",
+    "vitest": "^3.0.6"
+  }
+}
