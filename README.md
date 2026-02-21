@@ -16,11 +16,27 @@ Claude Code 같은 AI 에이전트를 팀에서 사용하면 이런 상황이 �
 - `git push` 했더니 충돌 폭탄
 - 누가 어떤 파일을 건드리고 있는지 아무도 모름
 
-**filelock**은 이 문제를 해결합니다:
+**agent-filelock**은 이 문제를 해결합니다:
 
 - 파일을 수정하기 전에 **자동으로 잠금**을 걸어서 다른 사람이 동시에 수정하지 못하게 합니다
 - **실시간 대시보드**에서 누가 어떤 파일을 작업 중인지 한눈에 볼 수 있습니다
 - Claude Code에 **훅(Hook)**을 연결하면 별도 조작 없이 자동으로 동작합니다
+
+### 어떤 상황에서 보호해주나요?
+
+#### 다른 사람이 같은 파일을 수정 중일 때 (UUID가 다른 경우)
+
+팀원 간 협업 상황을 상정합니다. 다른 개발자(다른 UUID)의 Claude가 파일을 수정 중이면:
+
+- **수정 중인 파일** → 수정이 **차단**됩니다. "이 파일은 OOO이 작업 중입니다"라는 메시지와 함께 Claude가 수정을 거부합니다.
+- **수정이 끝난 파일** → 역시 **차단**됩니다. 다른 개발자가 이전에 수정한 파일은 git 충돌 가능성이 있으므로, `git pull`로 최신 변경을 받은 뒤 `filelock ack` 명령어를 실행해야 차단이 해제됩니다.
+
+#### 내가 여러 세션을 동시에 돌릴 때 (UUID가 같은 경우)
+
+1인 병렬 작업 상황을 상정합니다. 같은 UUID로 Claude Code 세션을 여러 개 띄우면:
+
+- **다른 세션이 수정 중인 파일** → 수정이 **차단**됩니다. 같은 개발자라도 세션이 다르면 동시 수정을 막아서 파일 꼬임을 방지합니다.
+- **다른 세션이 수정을 끝낸 파일** → **그냥 통과**합니다. 같은 UUID이므로 git 충돌 걱정이 없기 때문입니다.
 
 ### 설치
 
@@ -116,6 +132,12 @@ filelock ack src/index.ts            # 다른 사람 변경 확인 처리
 | `HOST` | `0.0.0.0` | 서버 바인딩 주소 |
 | `DB_PATH` | `./data/filelock.db` | 데이터베이스 경로 |
 
+### 주의사항
+
+대규모 서비스에서 활용하기엔 적합하지 않습니다. **5인 미만의 작은 규모**에서 사용하기를 권장합니다.
+
+`filelock ack`은 해당 파일에 대해 나의 UUID가 아닌 **모든 변경 기록을 일괄 삭제**하는 단순한 구현입니다. 예를 들어 개발자 A, B, C가 같은 파일을 수정한 경우, 개발자 D가 `ack`을 실행하면 A, B, C의 변경 기록이 모두 사라집니다. 특정 개발자의 변경만 선택적으로 확인 처리하는 기능은 없습니다.
+
 ---
 
 ## English
@@ -128,11 +150,27 @@ When teams use AI agents like Claude Code, this happens:
 - `git push` → conflict explosion
 - Nobody knows who is touching which file
 
-**filelock** solves this:
+**agent-filelock** solves this:
 
 - **Automatically locks files** before editing so nobody else can modify them at the same time
 - **Real-time dashboard** shows who is working on which file at a glance
 - Connect **hooks** to Claude Code and it works automatically — zero manual effort
+
+### What does it protect against?
+
+#### When another person is editing the same file (different UUID)
+
+This covers team collaboration scenarios. If another developer's (different UUID) Claude is working on a file:
+
+- **File currently being edited** → Edit is **blocked**. Claude refuses with a message like "This file is locked by OOO".
+- **File already edited by another developer** → Also **blocked**. Since there's a risk of git conflicts, you should `git pull` the latest changes first, then run `filelock ack` to unblock.
+
+#### When you run multiple sessions in parallel (same UUID)
+
+This covers single-developer parallel work. If you have multiple Claude Code sessions with the same UUID:
+
+- **File being edited by another session** → Edit is **blocked**. Even for the same developer, concurrent edits from different sessions are prevented to avoid file corruption.
+- **File already edited by another session** → **Passes through**. Since it's the same UUID, there's no risk of git conflicts.
 
 ### Install
 
@@ -227,6 +265,12 @@ Auto-refreshes every 5 seconds.
 | `PORT` | `8079` | Server port |
 | `HOST` | `0.0.0.0` | Server bind address |
 | `DB_PATH` | `./data/filelock.db` | Database path |
+
+### Caution
+
+This is not suitable for large-scale services. Recommended for **small teams of fewer than 5 people**.
+
+`filelock ack` is a simple implementation that **deletes all change records except your own UUID** for a given file. For example, if developers A, B, and C all modified the same file, and developer D runs `ack`, the change records of A, B, and C are all removed at once. There is no way to selectively acknowledge a specific developer's changes.
 
 ---
 

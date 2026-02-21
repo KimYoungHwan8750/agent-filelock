@@ -76,7 +76,7 @@ async function main() {
         deny(
           `Warning: ${rawPath} was recently modified by other developer(s): ${changers}. ` +
           `There may be unmerged changes that could cause git conflicts. ` +
-          `Run "filelock ack ${rawPath}" to acknowledge and proceed, or pull the latest changes first.`
+          `Pull the latest changes with "git pull" first, then run "filelock ack ${rawPath}" to unblock.`
         );
         return;
       }
