@@ -172,6 +172,12 @@ export class SqliteLockStore implements LockStore {
     return result.changes;
   }
 
+  deleteAll(): { deletedLocks: number; deletedChanges: number } {
+    const locksResult = this.db.prepare('DELETE FROM locks').run();
+    const changesResult = this.db.prepare('DELETE FROM change_records').run();
+    return { deletedLocks: locksResult.changes, deletedChanges: changesResult.changes };
+  }
+
   private toRecord(row: DbRow): LockRecord {
     return {
       id: row.id,

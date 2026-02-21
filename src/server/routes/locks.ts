@@ -106,6 +106,10 @@ export async function lockRoutes(
     }
   );
 
+  app.delete('/clear-all', async () => {
+    return lockService.clearAll();
+  });
+
   // --- Change tracking ---
 
   app.get('/changes', async () => {

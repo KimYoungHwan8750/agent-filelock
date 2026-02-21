@@ -138,6 +138,8 @@ filelock ack src/index.ts            # 다른 사람 변경 확인 처리
 
 `filelock ack`은 해당 파일에 대해 나의 UUID가 아닌 **모든 변경 기록을 일괄 삭제**하는 단순한 구현입니다. 예를 들어 개발자 A, B, C가 같은 파일을 수정한 경우, 개발자 D가 `ack`을 실행하면 A, B, C의 변경 기록이 모두 사라집니다. 특정 개발자의 변경만 선택적으로 확인 처리하는 기능은 없습니다.
 
+1인 개발할 때 병렬 에이전트의 충돌 해결용으로는 매우 흡족한 사용자 경험을 느꼈습니다. 편하게 써주시기 바라겠습니다!
+
 ---
 
 ## English
@@ -271,6 +273,8 @@ Auto-refreshes every 5 seconds.
 This is not suitable for large-scale services. Recommended for **small teams of fewer than 5 people**.
 
 `filelock ack` is a simple implementation that **deletes all change records except your own UUID** for a given file. For example, if developers A, B, and C all modified the same file, and developer D runs `ack`, the change records of A, B, and C are all removed at once. There is no way to selectively acknowledge a specific developer's changes.
+
+For solo development with parallel agents, this tool provides a very satisfying experience for resolving conflicts. Feel free to use it!
 
 ---
 

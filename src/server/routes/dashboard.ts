@@ -55,6 +55,21 @@ const HTML = /* html */ `<!DOCTYPE html>
   .empty { text-align: center; padding: 64px 0; color: #475569; }
   .empty-icon { font-size: 48px; margin-bottom: 12px; }
   .empty-text { font-size: 16px; }
+
+  .btn-danger { background: #991b1b; color: #fecaca; border: 1px solid #dc2626; padding: 8px 16px; border-radius: 6px; font-size: 13px; font-weight: 600; cursor: pointer; transition: background 0.15s; }
+  .btn-danger:hover { background: #b91c1c; }
+  .btn-danger:disabled { opacity: 0.5; cursor: not-allowed; }
+
+  .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 100; align-items: center; justify-content: center; }
+  .modal-overlay.active { display: flex; }
+  .modal { background: #1e293b; border: 1px solid #334155; border-radius: 12px; padding: 24px; max-width: 400px; width: 90%; text-align: center; }
+  .modal h3 { font-size: 16px; margin-bottom: 8px; color: #f1f5f9; }
+  .modal p { font-size: 14px; color: #94a3b8; margin-bottom: 20px; }
+  .modal-actions { display: flex; gap: 12px; justify-content: center; }
+  .btn-cancel { background: #334155; color: #e2e8f0; border: 1px solid #475569; padding: 8px 20px; border-radius: 6px; font-size: 13px; cursor: pointer; }
+  .btn-cancel:hover { background: #475569; }
+  .btn-confirm { background: #dc2626; color: #fff; border: none; padding: 8px 20px; border-radius: 6px; font-size: 13px; font-weight: 600; cursor: pointer; }
+  .btn-confirm:hover { background: #ef4444; }
 </style>
 </head>
 <body>
@@ -75,9 +90,23 @@ const HTML = /* html */ `<!DOCTYPE html>
   <div class="container">
     <div class="toolbar">
       <div class="info"><span class="pulse"></span>Auto-refreshing every 5s</div>
-      <div class="info" id="lastUpdated"></div>
+      <div style="display:flex;align-items:center;gap:12px;">
+        <div class="info" id="lastUpdated"></div>
+        <button class="btn-danger" onclick="showClearModal()">Clear All Data</button>
+      </div>
     </div>
     <div id="content"></div>
+  </div>
+
+  <div class="modal-overlay" id="clearModal">
+    <div class="modal">
+      <h3>Clear All Data</h3>
+      <p>All active locks and change records will be permanently deleted. This action cannot be undone.</p>
+      <div class="modal-actions">
+        <button class="btn-cancel" onclick="hideClearModal()">Cancel</button>
+        <button class="btn-confirm" id="confirmClearBtn" onclick="clearAllData()">Delete All</button>
+      </div>
+    </div>
   </div>
 
 <script>
@@ -184,6 +213,28 @@ function formatRemaining(expiresAt) {
 
 function escHtml(s) {
   return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function showClearModal() { document.getElementById('clearModal').classList.add('active'); }
+function hideClearModal() { document.getElementById('clearModal').classList.remove('active'); }
+
+async function clearAllData() {
+  const btn = document.getElementById('confirmClearBtn');
+  btn.disabled = true;
+  btn.textContent = 'Deleting...';
+  try {
+    const res = await fetch(API + '/clear-all', { method: 'DELETE' });
+    const data = await res.json();
+    if (data.ok) {
+      hideClearModal();
+      refresh();
+    }
+  } catch (e) {
+    // ignore
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Delete All';
+  }
 }
 
 refresh();

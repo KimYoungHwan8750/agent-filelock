@@ -20,4 +20,5 @@ export interface LockStore {
   findChangesByPath(normalizedPath: string, excludeUuid: string): ChangeRecord[];
   findAllChanges(): ChangeRecord[];
   deleteChangesByPath(normalizedPath: string, excludeUuid?: string): number;
+  deleteAll(): { deletedLocks: number; deletedChanges: number };
 }

@@ -246,6 +246,11 @@ export class LockService {
     return { ok: true, clearedCount: count };
   }
 
+  clearAll(): { ok: boolean; deletedLocks: number; deletedChanges: number } {
+    const result = this.store.deleteAll();
+    return { ok: true, ...result };
+  }
+
   private getDefaultTtl(owner: string): number {
     return parseOwnerType(owner) === 'claude'
       ? DEFAULT_AGENT_TTL_MINUTES
